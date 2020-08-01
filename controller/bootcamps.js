@@ -138,7 +138,7 @@ exports.deleteBootcamp = async (req, res, next) => {
 		if (!bootcamp) {
 			return next(new ErrorResponse(`Resource not found with id of ${id}`, 404))
 		}
-    bootcamp.remove()
+    await bootcamp.remove()
 		res.status(200).json({
 			status: 'success',
 			data: {}
