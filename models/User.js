@@ -47,7 +47,7 @@ UserSchema.methods.toJSON = function () {
 }
 
 // Sign JWT
-UserSchema.methods.getSignedJwtToken = async function () {
+UserSchema.methods.getSignedJwtToken = function () {
   const user = this
   return jwt.sign({ _id: user._id.toString() },process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE})
