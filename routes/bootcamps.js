@@ -1,4 +1,4 @@
-const express = require('express');
+const express = require('express')
 
 const {
   getBootcamps,
@@ -8,7 +8,7 @@ const {
   deleteBootcamp,
   bootcampPhotoUpload,
   getBootcampsInRadius
-} = require('../controller/bootcamps');
+} = require('../controller/bootcamps')
 
 const Bootcamp = require('../models/Bootcamp')
 
@@ -33,12 +33,12 @@ router
 router
 	.route('/')
 	.get(advancedResults(Bootcamp, 'courses'), getBootcamps)
-	.post(createBootcamp);
+	.post(createBootcamp)
 
 router
   .route('/:id')
   .get(getBootcamp)
   .put(updateBootcamp)
-  .delete(deleteBootcamp);
+  .delete(deleteBootcamp)
 
-module.exports = router;
+module.exports = router
