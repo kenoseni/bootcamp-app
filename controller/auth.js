@@ -109,7 +109,7 @@ exports.forgotPassword = asyncHandler(async(req, res, next) => {
 
 // @desc			Reset Password
 // @route			PUT  /api/v1/auth/resetpassword:resettoken
-// @access		    PUblic
+// @access		PUblic
 exports.resetPassword = asyncHandler(async(req, res, next) => {
   // GET hashed token
   const resetPasswordToken = crypto.createHash('SHA256').update(req.params.resettoken).digest('hex')
@@ -127,6 +127,45 @@ exports.resetPassword = asyncHandler(async(req, res, next) => {
   user.password = req.body.password
   user.resetPasswordToken = undefined
   user.resetPasswordExpire = undefined
+
+  await user.save()
+
+  sendTokenResponse(user, 200, res)
+})
+
+
+// @desc			Update user details
+// @route			PUT  /api/v1/auth/updatedetails
+// @access		Private
+exports.updateDetails = asyncHandler(async(req, res, next) => {
+  const fieldsToUpdate = {
+    name: req.body.name,
+    email: req.body.email
+  }
+
+  const user = await User.findByIdAndUpdate(req.user._id, fieldsToUpdate, {
+    new: true,
+    runValidators: true 
+  })
+
+  res.status(200).json({
+    status: 'success',
+    data: user
+  })
+})
+
+// @desc			Update password
+// @route			PUT  /api/v1/auth/updatepassword
+// @access		Private
+exports.updatePassword = asyncHandler(async(req, res, next) => {
+  const user = await User.findById(req.user._id).select('+password')
+
+  // Check current password
+  if (!(await user.matchPassword(req.body.currentPassword))) {
+    return next(new ErrorResponse('Password incorrect', 401))
+  }
+
+  user.password = req.body.newPassword
 
   await user.save()
 
