@@ -44,4 +44,3 @@ exports.authorize = (...roles) => {
     next()
   }
 }
-
