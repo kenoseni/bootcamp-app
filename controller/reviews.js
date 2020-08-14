@@ -42,7 +42,7 @@ exports.getReview = asyncHandler(async (req, res, next) => {
   })
 })
 
-// @desc		reviews
+// @desc		Add reviews
 // @route		POST  /api/v1/bootcamps/:bootcampId/reviews
 // @access	Private
 exports.addReview = asyncHandler(async (req, res, next) => {
@@ -52,7 +52,7 @@ exports.addReview = asyncHandler(async (req, res, next) => {
   const bootcamp = Bootcamp.findById(req.params.bootcampId)
 
   if (!bootcamp) {
-    next(new ErrorResponse(`No bootcamps with the id of ${req.params.bootcampId}, 404`))
+    return next(new ErrorResponse(`No bootcamps with the id of ${req.params.bootcampId}, 404`))
   }
 
   const review = await Review.create(req.body)
@@ -60,5 +60,60 @@ exports.addReview = asyncHandler(async (req, res, next) => {
   res.status(201).json({
     status: 'success',
     data: review
+  })
+})
+
+// @desc		Update reviews
+// @route		PUT  /api/v1/reviews/:id
+// @access	Private
+exports.updateReview = asyncHandler(async (req, res, next) => {
+
+  let review = await Review.findById(req.params.id)
+
+  if (!review) {
+    return next(new ErrorResponse(`No review with the id of ${req.params.id}, 404`))
+  }
+
+  // Make sure review belongs to user or admin
+
+  if (review.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(new ErrorResponse(`Not authorised to update review`, 401))
+  }
+
+  review = await Review.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true
+  })
+
+  res.status(200).json({
+    status: 'success',
+    data: review
+  })
+})
+
+// @desc			Delete review
+// @route			DELETE  /api/v1/review/:id
+// @access		Private
+exports.deleteReview = asyncHandler(async (req, res, next) => {
+  
+  const { id } =  req.params
+  const review = await Review.findById(id)
+
+  if (!review) {
+    return next(new ErrorResponse(`Resource not found with id of ${id}`, 404))
+  }
+  
+  // Make sure user is review owner
+  if (review.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(new ErrorResponse(
+      `User ${req.user.id} is not authorized to delete this review`, 401
+    ))
+  }
+
+  await review.remove()
+  
+  res.status(200).json({
+    status: 'success',
+    data: {}
   })
 })
