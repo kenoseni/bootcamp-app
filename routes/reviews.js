@@ -3,7 +3,8 @@ const router = express.Router({ mergeParams: true });
 
 const {
   getReviews,
-  getReview
+  getReview,
+  addReview
 } = require('../controller/reviews')
 
 const Review = require('../models/Review')
@@ -17,6 +18,7 @@ router
     path: 'bootcamp',
     select: 'name description'
   }), getReviews)
+  .post(protect, authorize('user', 'admins'),addReview)
 
 router
 .route('/:id')
