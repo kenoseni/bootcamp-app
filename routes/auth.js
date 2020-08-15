@@ -2,6 +2,7 @@ const express = require('express')
 const {
     register,
     login,
+    logout,
     getCurrentLoggedInUser,
     forgotPassword,
     resetPassword,
@@ -15,6 +16,7 @@ const router = express.Router();
 router
  .post('/register', register)
  .post('/login', login)
+ .get('/logout', logout)
  .get('/me', protect, getCurrentLoggedInUser)
  .post('/forgotpassword', forgotPassword)
  .put('/resetpassword/:resettoken', resetPassword)
